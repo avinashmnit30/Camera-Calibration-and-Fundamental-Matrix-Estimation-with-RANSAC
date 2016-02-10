@@ -1,0 +1,477 @@
+<html>
+<head>
+<title>Computer Vision Project</title>
+<link href='http://fonts.googleapis.com/css?family=Nunito:300|Crimson+Text|Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" title="Default" href="styles/github.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>  
+
+<link rel="stylesheet" href="highlighting/styles/default.css">
+<script src="highlighting/highlight.pack.js"></script>
+
+<style type="text/css">
+body {
+	margin: 0px;
+	width: 100%;
+	font-family: 'Crimson Text', serif;
+	font-size: 20px;
+	background: #fcfcfc;
+}
+h1 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 28px;
+	margin: 25px 0px 0px 0px;
+	text-transform: lowercase;
+
+}
+
+h2 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 32px;
+	margin: 15px 0px 35px 0px;
+	color: #333;	
+	word-spacing: 3px;
+}
+
+h3 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 26px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+h4 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 22px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+
+h5 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 18px;
+	margin: 10px 0px 10px 0px;
+	color: #111;
+	word-spacing: 2px;
+}
+
+p, li {
+	color: #444;
+}
+
+a {
+	color: #DE3737;
+}
+
+.container {
+	margin: 0px auto 0px auto;
+	width: 1160px;
+}
+
+#header {
+	background: #333;
+	width: 100%;
+}
+
+#headersub {
+	color: #ccc;
+	width: 960px;
+	margin: 0px auto 0px auto;
+	padding: 20px 0px 20px 0px;
+}
+
+.chart {
+	width: 480px;
+}
+.lol {
+	font-size: 16px;
+	color: #888;
+	font-style: italic;
+}
+.sep {
+	height: 1px;
+	width: 100%;
+	background: #999;
+	margin: 20px 0px 20px 0px;
+}
+.footer{
+	font-size: 16px;
+}
+.latex {
+	width: 100%;
+}
+
+.latex img {
+	display: block;
+	margin: 0px auto 0px auto;
+}
+
+pre {
+	font-family: 'Droid Sans Mono';
+	font-size: 14px;
+}
+
+table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+table td img {
+  text-align: center;
+  vertical-align: middle;
+}
+
+#contents a {
+}
+</style>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
+</head>
+<body>
+<div id="header" >
+<div id="headersub">
+<h1>Wei Yang Quek</h1>
+</div>
+</div>
+<div class="container">
+
+<h2> Project 3 / Camera Calibration and Fundamental Matrix Estimation with RANSAC</h2>
+
+<p> 	In this project, I was introduced to camera and scene geometry via the completion of 3 different portions which are described in the following sections:</p>
+
+<a name="content"><ol>
+<li><a href="#part1">Estimation of Projection Matrix and Camera Center</a></li>
+<li><a href="#part2">Estimation of Fundamental Matrix</a></li>
+<li><a href="#part3">Estimation of Fundamental Matrix with unreliable SIFT Matches using RANSAC</a></li>
+</ol>
+</a>
+
+    <p>Finally, the results stemming from the last part will be discussed in greater detail with the comparison of the original 8 point algorithm to the improved normalised 8 point algorithm that was also implemented. This can be accessed via the following sections:</p>
+    
+    <ol>Results
+<li><a href="#mr">Mount Rushmore</a></li>
+<li><a href="#nd">Notre Dame</a></li>
+<li><a href="#eg">Episcopal Gaudi</a></li>
+</ol>
+    
+    
+<p> </p>
+
+<div style="clear:both">
+
+<!--    PART 1       -->
+    
+    <h3><a name="part1">Estimation of Projection Matrix and Camera Center</a></h3>
+
+    <h4>Estimating Projection Matrix</h4>
+
+    <p> 	The estimation of the projection matrix was done by getting the series of 2D coordinates with their corresponding 3D coordinates and placing them into the form as shown below:</p>
+    
+    <center><img src="images/Others/ProjMatrixForm.PNG" width="50%"/></center>
+    
+    <p> Here, X_n, Y_n and Z_n and u_n, v_n represents the 3D and 2D coordinate of the Nth pairs of corresponding matches respectively. In this form, I could then do a linear regression to find the Projection Matrix M. The result of my projection Matrix M is as follows:</p>
+    
+    <center><img src="images/Others/ProjectionMatrix.PNG"/></center>
+    
+    <h4>Calculating the Camera Coordinates</h4>
+    
+    <p> To calculate the camera center, I could then just use the Projection Matrix calculated. By taking the first 3 columns of the projection Matrix, I could take the transpose of that, negate it and multiply it by the last the last column of the projection matrix to get the camera center. I found that the camera was at Coordinates (-1.5126, -2.3517, 0.2827) as shown below.</p>
+    
+    <center><img src="images/Others/Center.PNG"/>
+    <img src="images/Others/res1.PNG"/></center>
+    
+    <p>When plotted in a 3D plot against the matching coordinates, the result is as follows:</p>
+    
+    <center><img src="images/Others/res2.PNG"/></center>
+    
+    <a href="#content">Back to top</a>
+    
+    
+<!--    PART 2   -->
+    
+    
+    <h3><a name="part2">Estimation of Fundamental Matrix</a></h3>
+
+    <p> 	The next part requires the estimation of the fundamental matrix given 2 sets of corresponding matches between 2 images taken of the same scene when the camera is in different positions. It utilises the property that defines the fundamental Matrix as:</p>
+    
+    <center><img src="images/Others/fundamentalMatrixForm.PNG"/></center>
+    
+    <p> With 9 unknowns, and it being a homogeneous system, I need at least 8 points or more to perform the 8 point algorithm. After setting up the Matrices as above, I then solved for f using Singular Vector Decomposition to reduce its rank. I could now estimate the rank 2 matrix by setting the smallest value as 0 and using it to calculate the fundamental matrix. My code is to achieve this is as follows:</p>
+    
+    <pre><code>
+    %Solving for f using Singular Vector Decomposition
+    [U, S, V] = svd(A);
+    f = V(:,end);
+    F = reshape(f, [3 3])';
+
+    %Resolving det(F) =0 constraint using SVD
+    [U, S, V] = svd(F);
+    S(3,3) = 0;
+    F_matrix= U*S*V';
+
+    </code></pre>
+    
+    <p>The fundamental matrix calculated through this method is as follows: </p>
+    
+    <center><img src="images/Others/FundamentalMatrix.PNG"/></center>
+        
+    <p>The Epipolar Lines for this fundamental matrix is as follows: </p>
+    
+    <center>
+        <img src="images/part2/nonorm/img1.PNG" width = "40%"/>
+        <img src="images/part2/nonorm/img2.PNG" width = "40%"/>
+    </center>
+        
+    <h4>Extra Credit/Graduate Credit</h4>
+    
+    <p> To improve on this fundamental matrix, I implemented the nomalised 8 point algorithm. In my code, this can be toggled on or off by setting normalise to 1 or 0 in estimate_fundamental_matrix.m. The basis for this improvement is to allow for a better distribution of the homogeneous image coordinates in the space. In the original 8-point algorithm, a homogeneous representation of 2D image coordinate (y1,y2,1) may have y1 and y2 have much larger range the the 3rd value of 1. </p>
+        <p> Hence, to improve on this, the normalise algorithm calculates the center of all points, shift the image such that the center is at the origin and scales it such that the mean square distance of each point is at most 2.</p>
+    <p>
+    In my code, I first calculated the average x and y value for both images. I then calculated the scaling factor through finding the total squared distance between all the points, dividing them by the number of points to get the mean squared distance and finding the scale by dividing 2 by that amount and square rooting the value. This is done separately for both images. My code for this is as follows:
+    </p>
+    
+    <pre><code>
+    %Mean Coordinates for Points a and b
+    C1 = mean(Points_a);
+    Cu1 = C1(1,1);
+    Cv1 = C1(1,2);
+    
+    C2 = mean(Points_b);
+    Cu2 = C2(1,1);
+    Cv2 = C2(1,2);
+    
+    %Finding total Euclidean Distance of each point from Cu,Cv for each image
+    dist1 = 0; dist2 = 0;
+    for i = 1:noOfPts
+        dist1 = dist1 + (Points_a(i,1)-Cu1)^2 + (Points_a(i,2)-Cv1)^2;
+        dist2 = dist2 + (Points_b(i,1)-Cu2)^2 + (Points_b(i,2)-Cv2)^2;
+    end
+    %dist1/noOfPoints * s1 = 2; --> s1 = 2/(dist1/noOfPoints)
+    avgsqdist1 = dist1/noOfPts;
+    avgsqdist2 = dist2/noOfPts;
+    
+    %Finding scale transformation for point set a and b
+    s1 = sqrt(2/(avgsqdist1));
+    s2 = sqrt(2/(avgsqdist2));
+    </code></pre>
+    
+    <p> Next, I then find the Transformation Matrix for each image via the following formula: </p>
+    <center><img src="images/Others/Norm8Trans.PNG"/></center>
+    
+    <p> Each point in each image is then transformed by their respective transformation matrix to form a new set of normalised points. These points are then used to create the new fundamental matrix under the normalised coordinates. Finally, the fundamental matrix undergoes an adjustment so that it can work on the original pixel coordinate.</p>
+    
+    <pre><code>
+    if normalise == 1
+        F_temp = F_matrix;
+        F_matrix = transpose(Tb)*F_temp*Ta;
+    end
+    </code></pre>
+    
+    <p>The Fundamental matrix calculated through this normalised method is as follows: </p>
+    
+    <center><img src="images/Others/NormalisedFundamentalMatrix.PNG"/></center>
+    
+    <p>Through this normalisation, there was a slight improvement in the fundamental matrix calculated, as seen from the epipolar lines drawn which cut each point more accurately. This result can be seen below: </p>
+    
+    <center>
+    
+        <img src="images/part2/norm/img1.PNG" width="40%"/>
+        <img src="images/part2/norm/img2.PNG" width="40%"/>
+    
+    </center>
+
+
+    <a href="#content">Back to top</a>
+    
+    
+<!--    PART 3 -->
+    
+    
+
+    <h3><a name="part3">Estimation of Fundamental Matrix with unreliable SIFT Matches using RANSAC</a></h3>
+
+    <h4>The RANSAC algorithm</h4>
+
+    <p> In this section, I estimated the fundamental matrix using the RANdom SAmpling Consensus method. A list of possible matches were given to me through an unreliable SIFT matching of 2 different images of the same scene taken from different camera orientations and positions.</p>
+    
+    <p>The algorithm is as follows. First, I took a set number of random points, in this case, my default was 8 points, but can be set by the user through manipulating the variable s.</p>
+
+    
+    <pre><code>
+        %get 8 random indices
+        ind = randperm(noOfPossibleMatches,s);
+        %get fundamental matrix with the 8 random indices
+        tempFMat = estimate_fundamental_matrix(matches_b(ind,:), matches_a(ind,:));
+    
+    </code></pre>
+    
+    <p> Next, I used this points to generate a fundamental matrix using the function from the previous section. I then used this fundamental matrix to test how many of each point from the SIFT list of possible matches matches their corresponding points within a threshold. These points that matches are considered as inliers. The threshold can be set by the user through manipulating the variable 'threshold'. To find these inliers, I used the fundamental matrix equation. The code for this is as follows.</p>
+    
+   <pre><code>
+    %iterate through possible matches to find how many lie within threshold
+    for i = 1:noOfPossibleMatches
+        val = [matches_b(i,:) 1] * tempFMat * [matches_a(i,1); matches_a(i,2); 1];
+        
+        if abs(val) <= threshold
+            tempNoOfCorrectMatches = tempNoOfCorrectMatches + 1;
+            tempCorrectMatchInd = [tempCorrectMatchInd; i];
+        end
+    end
+    
+    </code></pre> 
+    
+    <p> If all the points lie within the threshold, the resultant matrix is taken as the fundamental matrix.</p>
+    
+    <p> However, chances are, this is usually not the case, and the process is repeated for N times and the final matrix takes after the matrix that produces the most inliers. To count the number of times, N, that I should repeat the tests, I allowed the user to set the probability that one sample is free from outlier and the probability that a point is an outlier and calculated N through the equation N = log(1-p)/log(1-(1-e)^s). By default, the proability that at least one random sample is free from outlier is 0.99 following the notes.
+    Alternatively, the user can set the number of times he wants to run the test. If he sets it to 0, it will be calculated through the values as stated above.
+    
+    </p>
+    
+    <pre><code>
+        N = 0;
+        % noOfPointCorr is the Number of Point Correspondence
+        s = 8;
+        %threshold of which points can be considered inliers
+        threshold = 0.001;
+        %p = Probability at least one random sample is free from outlier
+        p = 0.99;
+        %e = outlier ratio, i.e. the probability that a point is an outlier 
+        e = 0.7;
+
+        %N is the number of samples derived from #samples s to get a probability p
+        %that at least one random sample is free from outlier.
+
+        if N == 0
+            N = log(1-p)/log(1-(1-e).^s);
+        end
+    </code></pre>
+    
+    <p> As with the resultant matrix being obtained from the test with the most inliers, the matches of inliers are also taken and saved as inliers_a and inliers_b as results of the matrix. I added a matchCap to limit the number of matches to the maximum of the number of possible matches and the matchCap to prevent overcluttering of the resulting image. Here, I limit it to 30 matches.</p>
+    
+    
+    
+    <h3>Results</h3>
+     
+    <h4><a name="mr">Mount Rushmore</a></h4>
+    <p>With the Mount Rushmore Image Pair, I tested a threshold of 0.001, a probability of 0.99 and an outlier ratio of 0.55 to get 2736 tests with 20 matches. The results are as follows: </p> 
+    
+    
+    <center>
+    <img src="images/part3/a/MR/Img1.png" width="40%"/>
+    <img src="images/part3/a/MR/Img2.png" width="40%"/><br/>
+    <img src="images/part3/a/MR/Match.png" width="50%"/>
+    
+    </center>
+    
+    <h5>Normalised 8 Point Algorithm (Extra/Graduate Credit)</h5>
+    
+    <p>When using the normalised version of the 8 point algorithm, I had a slight improvement in results as shown below:</p>
+    
+        <center>
+    <img src="images/part3/an/MR/Img1.png" width="40%"/>
+    <img src="images/part3/an/MR/Img2.png" width="40%"/><br/>
+    <img src="images/part3/an/MR/Match.png" width="50%"/>
+    
+    </center>
+        <a href="#content">Back to top</a>
+    <h4><a name="nd">Notre Dame</a></h4>
+    <p>With the Notre Dame Image Pair, with the same settings as above, I got the following results for the original 8 Points Algorithm.</p>
+    
+        <center>
+    <img src="images/part3/a/ND/Img1.png" width="40%"/>
+    <img src="images/part3/a/ND/Img2.png" width="40%"/><br/>
+    <img src="images/part3/a/ND/Match.png" width="50%"/>
+    
+    </center>
+     
+        <h5>Normalised 8 Point Algorithm (Extra/Graduate Credit)</h5>
+    
+    <p>When using the normalised version of the 8 point algorithm, This produced a slight improvement as well:</p>
+    
+        <center>
+    <img src="images/part3/an/ND/Img1.png" width="40%"/>
+    <img src="images/part3/an/ND/Img2.png" width="40%"/><br/>
+    <img src="images/part3/an/ND/Match.png" width="50%"/>
+    
+    </center> 
+    
+    <p>While it is hard to compare between the two as the points are different, it can be seen that there is near 100% accuracy in matches, even with points that seem really hard to match.</p>
+    
+        <a href="#content">Back to top</a>
+        <h4><a name="eg">Episcopal Gaudi</a></h4>
+    <p>With the Episcopal Gaudi Image Pair, with the same settings as above, I got the following results for the original 8 Points Algorithm with 31 matches.</p>
+    
+        <center>
+    <img src="images/part3/a/EG/Img1.png" width="40%"/>
+    <img src="images/part3/a/EG/Img2.png" width="40%"/><br/>
+    <img src="images/part3/a/EG/Match.png" width="50%"/>
+    
+    </center>
+    
+    <p> It can be seen that this produced alot of wrong matches and hence worse results than the last two set of images.</p>
+     
+        <h5>Normalised 8 Point Algorithm (Extra/Graduate Credit)</h5>
+    
+    <p>To see if the normalised version will bring about a marked improvement here, since there was bad results in the original one, I tested it using the same settings and achieved the following results with 1 matches:</p>
+    
+        <center>
+    <img src="images/part3/an/EG/Img1.png" width="40%"/>
+    <img src="images/part3/an/EG/Img2.png" width="40%"/><br/>
+    <img src="images/part3/an/EG/Match.png" width="50%"/>
+    
+    </center> 
+    
+    <p>It can be seen that with the normalised version, there is a perfect match between the two images. To explore this further by increasing the number of test in a bid to get more resultant matches, I increased the outlier ratio, e, to 0.7, resulting in 70187 tests.</p>
+    
+    <p>With the original 8 point algorithm, I got the following results with 50 matches: </p>
+    
+        <center>
+    <img src="images/part3/c/EG/Img1.png" width="40%"/>
+    <img src="images/part3/c/EG/Img2.png" width="40%"/><br/>
+    <img src="images/part3/c/EG/Match.png" width="50%"/>
+    
+    </center>     
+    
+    <p>Again, we can see alot of mismatches. With the normalised 8 point algorithm, however, we get the following result with 16 matches:</p>
+    
+    
+            <center>
+    <img src="images/part3/cn/EG/Img1.png" width="40%"/>
+    <img src="images/part3/cn/EG/Img2.png" width="40%"/><br/>
+    <img src="images/part3/cn/EG/Match.png" width="50%"/>
+    
+    </center> 
+    
+    <p>Although I increased the outlier ratio which increased the number of tests by a factor of 10 leading to a large increase in computational time, there was only 16 matches. Another way was to increase the threshold, which will increase the chances of wrong matches but allow a huge increase in possible matches without much increase in computational time. Hence, I decided to strike a middle with an increase in threshold to 0.005 (from 0.001) and a increase in outlier ratio from the original (of 0.55) to 0.6. With this, I had the following results: </p>
+    
+    <p>This shows the original 8 point algorithm's results with 50 matches: </p>
+
+        <center>
+    <img src="images/part3/b/EG/Img1.png" width="40%"/>
+    <img src="images/part3/b/EG/Img2.png" width="40%"/><br/>
+    <img src="images/part3/b/EG/Match.png" width="50%"/>
+    
+    </center> 
+    
+    <p>And this shows the results with the normalised 8 point algorithm with 47 matches:</p>
+    
+        <center>
+    <img src="images/part3/bn/EG/Img1.png" width="40%"/>
+    <img src="images/part3/bn/EG/Img2.png" width="40%"/><br/>
+    <img src="images/part3/bn/EG/Match.png" width="50%"/>
+    
+    </center> 
+    
+    <p>Here we can see obvious mismatches coming into the results but overall, most of the points matched correctly.</p>
+        <a href="#content">Back to top</a>
+    
+    <p> In conclusion, from the results, normalised 8 point algorithm had a marked improvement over the 8 point algorithm which had many mismatches in more difficult pictures like the Episcopal Gaudi images. Where there were too few points, one could increase the threshold but this increases the chance that wrong matches get into the results. Another way is to increase the number of trials but this increases the computational time greatly.</p>
+    <a href="#content">Back to top</a>
+</body>
+</html>
